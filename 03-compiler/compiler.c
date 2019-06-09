@@ -90,16 +90,22 @@ void WHILE() {
 }
 
 // IF=if(E) STMT (else STMT)?
-void IF(){
+void IF() {
+  int elselabel = nextLabel();
+  int ifEnd = nextLabel(); 
   skip("if");
   skip("(");
   int e = E();
   skip(")");
+  emit("ifnot T%d goto L%d\n",e, elselabel);
   STMT();
+  emit("if t%d goto L%d\n", e,ifEnd);
   if(isNext("else")){
+    emit("(L%d)\n",elselabel);
     skip("else");
     STMT();
   }
+  emit("(L%d)\n", ifEnd);
 }
 
 void STMT() {
